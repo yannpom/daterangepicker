@@ -156,8 +156,14 @@
   border-radius: 4px;
   border: 1px solid transparent;
   white-space: nowrap;
-  cursor: pointer;
+  /*cursor: pointer;*/
 }
+
+.daterangepicker { cursor: default; }
+.daterangepicker .calendar-table td.available:not(.off) { cursor: pointer; }
+
+.daterangepicker .calendar-table th.prev, .daterangepicker .calendar-table th.next { cursor: pointer; }
+
 
 .daterangepicker .calendar-table {
   border: 1px solid #fff;
@@ -173,9 +179,10 @@
 }
 
 .daterangepicker td.available:hover, .daterangepicker th.available:hover {
-  background-color: #eee;
+  background-color: #4e8d00;
   border-color: transparent;
-  color: inherit;
+  /*color: inherit;*/
+  color: #fff;
 }
 
 .daterangepicker td.week, .daterangepicker th.week {
@@ -190,7 +197,7 @@
 }
 
 .daterangepicker td.in-range {
-  background-color: #ebf4f8;
+  background-color: #d9edb8;
   border-color: transparent;
   color: #000;
   border-radius: 0;
@@ -209,7 +216,7 @@
 }
 
 .daterangepicker td.active, .daterangepicker td.active:hover {
-  background-color: #357ebd;
+  background-color: #4e8d00;
   border-color: transparent;
   color: #fff;
 }
