@@ -355,7 +355,7 @@
 @media (min-width: 600px) {
 /*@media (min-width: 564px) {*/
   .daterangepicker {
-    width: auto; }
+    width: 600px; }
     .daterangepicker .ranges ul {
       width: 140px; }
     .daterangepicker.single .ranges ul {

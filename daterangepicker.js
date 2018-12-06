@@ -33,6 +33,7 @@
         //default settings for options
         this.parentEl = 'body';
         this.element = $(element);
+        this._dragging = false;
         //this.startDate = moment().startOf('day').add(100,'days');
         //this.endDate = moment().startOf('day').add(103,'days');
         this.startDate = moment().startOf('day');
@@ -85,6 +86,7 @@
         this.callback = function() { };
 
         //some state information
+        console.log("aaa isShowing false");
         this.isShowing = false;
         this.leftCalendar = {};
         this.rightCalendar = {};
@@ -1126,6 +1128,12 @@
 
             // Create a click proxy that is private to this instance of datepicker, for unbinding
             this._outsideClickProxy = $.proxy(function(e) { this.outsideClick(e); }, this);
+            /*
+            this._draggingSet = $.proxy(function(e) { console.log("dragging", this._dragging); this._dragging = true; }, this);
+            this._draggingReset = $.proxy(function(e) { console.log("dragging", this._dragging); this._dragging = false; }, this);
+
+            this._dragging = false;
+            */
 
             // Bind global datepicker mousedown for hiding and
             $(document)
@@ -1135,10 +1143,19 @@
               // also explicitly play nice with Bootstrap dropdowns, which stopPropagation when clicking them
               .on('click.daterangepicker', '[data-toggle=dropdown]', this._outsideClickProxy)
               // and also close when focus changes to outside the picker (eg. tabbing between controls)
-              .on('focusin.daterangepicker', this._outsideClickProxy);
+              .on('focusin.daterangepicker', this._outsideClickProxy)
+              .on("touchstart.daterangepicker", this._outsideClickProxy)
+              .on("touchmove.daterangepicker", this._outsideClickProxy);
+
+              /*
+              .on("touchstart", this._draggingReset)
+              .on("touchmove", this._draggingSet);
+              .on("touchmove", this._draggingSet);
+              */
 
             // Reposition the picker if the window is resized while it's open
             $(window).on('resize.daterangepicker', $.proxy(function(e) { this.move(e); }, this));
+
 
             this.oldStartDate = this.startDate.clone();
             this.oldEndDate = this.endDate.clone();
@@ -1149,6 +1166,13 @@
             this.move();
             this.element.trigger('show.daterangepicker', this);
             this.isShowing = true;
+
+            var scroll = $(window).scrollTop();
+            var scroll2 = this.container.offset().top;
+            console.log("scroll", scroll, scroll2);
+            if (scroll2 < scroll)
+                $([document.documentElement, document.body]).animate({scrollTop: scroll2}, 1000);
+
         },
 
         hide: function(e) {
@@ -1177,6 +1201,7 @@
         },
 
         toggle: function(e) {
+            console.log("toggle");
             if (this.isShowing) {
                 this.hide();
             } else {
@@ -1185,6 +1210,20 @@
         },
 
         outsideClick: function(e) {
+            //console.log(e);
+            console.log(e.type);
+
+            if (e.type == "touchstart") {
+                this._dragging = false;
+                return;
+            }
+            if (e.type == "touchmove") {
+                this._dragging = true;
+                return;
+            }
+
+
+            console.log("dragging", this._dragging );
             var target = $(e.target);
             // if the page is clicked anywhere except within the daterangerpicker/button
             // itself then call this.hide()
@@ -1193,7 +1232,8 @@
                 e.type == "focusin" ||
                 target.closest(this.element).length ||
                 target.closest(this.container).length ||
-                target.closest('.calendar-table').length
+                target.closest('.calendar-table').length ||
+                this._dragging
                 ) return;
             this.hide();
             this.element.trigger('outsideClick.daterangepicker', this);
@@ -1336,7 +1376,9 @@
                 //special case: clicking the same date for start/end,
                 //but the time of the end date is before the start date
                 //this.setEndDate(this.startDate.clone());
-                this.setEndDate(this.checkEndDate(this.startDate.clone(), this.startDate.clone()));
+                var dates = this.checkEndDate(this.startDate.clone(), this.startDate.clone());
+                this.setStartDate(dates[0]);
+                this.setEndDate(dates[1]);
             } else { // picking end
                 console.log("picking end");
                 if (this.timePicker) {
